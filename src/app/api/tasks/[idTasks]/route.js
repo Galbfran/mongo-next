@@ -29,10 +29,19 @@ export async function DELETE(request, {params}){
 }
 
 export async function PUT(request, {params}){
+    try {
+        let data = await request.json()
+        let taskUpdate = await Task.findByIdAndUpdate(params.idTasks , data, {
+            new:true
+        })
     
-
-
-    return NextResponse.json({
-        message:`modificando tarea ${params.idTasks}`
-    })
+        return NextResponse.json(taskUpdate)
+        
+    } catch (error) {
+        return NextResponse.json({
+            message:error.message
+        },{
+            status:400
+        })
+    }
 }
