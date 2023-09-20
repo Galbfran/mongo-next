@@ -23,9 +23,27 @@ export async function GET(request, {params}){
 }
 
 export async function DELETE(request, {params}){
-    return NextResponse.json({
-        message:`borrando tarea ${params.idTasks}`
-    })
+    try {
+        let data = await request.json()
+        let taskDelete = await Task.findByIdAndDelete(params.idTasks , data, {
+            new:true
+        })
+        
+        if(!taskDelete) return NextResponse.json({
+            message:"tarea no encontrada"
+        },{
+            status:404
+        })
+
+        return NextResponse.json(taskDelete)
+        
+    } catch (error) {
+        return NextResponse.json({
+            message:error.message
+        },{
+            status:400
+        })
+    }
 }
 
 export async function PUT(request, {params}){
