@@ -1,13 +1,16 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
+dotenv.config();
 const conn = {
     isConnected: false
 };
 
+const passwordMongo = process.env.PASSWORD_MONGO;
 export async function connectDB() {
     if (conn.isConnected) return;
-
-    const db = await mongoose.connect('mongodb://127.0.0.1:27017/nextmongocrud');
+//mongodb+srv://<user>:<password>@<cluster-url>?retryWrites=true&w=majority
+const db = await mongoose.connect(`mongodb+srv://francogalbiati984:${passwordMongo}@cluster0.t85pn3y.mongodb.net/`);
     const dbName = mongoose.connection.name;
     console.log(`Conectado a la base de datos: ${dbName}`);
     conn.isConnected = db.connections[0].readyState;
