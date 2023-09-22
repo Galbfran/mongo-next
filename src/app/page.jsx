@@ -14,7 +14,6 @@ export default async function Home() {
   return (
    <article>
     <div>
-      <h1>usando mongo DB</h1>
       <div className="grid grid-cols-3 gap-2">
         {
           tareas.map(task => <TaskCard key={task._id} task={task}/>)

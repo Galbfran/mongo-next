@@ -47,9 +47,13 @@ const FormPage = () => {
     }
 
     const updateTask = async() =>{
-        const res = await axios.put(`/api/tasks/${params.id}` , updateData(newTask))
-        router.push("/")
-        router.refresh()
+        try {
+            const res = await axios.put(`/api/tasks/${params.id}` , updateData(newTask))
+            router.push("/")
+            router.refresh()
+        } catch (error) {
+            console.log(error.message)
+        }
     }
 
     const handlerSubmit =async (e) =>{
