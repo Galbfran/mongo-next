@@ -1,9 +1,12 @@
 "use client"
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState , useEffect } from "react";
+import { useRouter , useParams } from "next/navigation";
+import axios from "axios";
+
 
 const FormPage = () => {
-    const router = useRouter()
+    const router = useRouter();
+    const params = useParams()
     const [ newTask , setNewTask ] = useState({
         title:"",
         description:""
@@ -21,18 +24,49 @@ const FormPage = () => {
                 body: JSON.stringify(newTask)
             })
             const data = await res.json()
-            console.log(data)
             router.push("/")
-            
+            router.refresh()
         } catch (error) {
             console.log(error.message)
         }
     }
 
+    const handlerDelete =async () =>{
+        if(window.confirm("Desea eliminar la tarea")){
+            try {
+                console.log(params.id)
+                const res = await axios.delete(`/api/tasks/${params.id}`);
+                console.log(res)
+                router.push("/");
+                router.refresh();
+                
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        
+    }
+    useEffect(() => {
+
+    },[])
+
+
     return(
-        <div className="h-[calc(100vh-7rem)] flex justify-center items-center">
-            <form onSubmit={handlerSubmit} >
-                <h2 className="font-bold text-3xl">Create Tarea:</h2>
+        <div className="h-[calc(100vh-7rem)] flex justify-center items-center ">
+            <form onSubmit={handlerSubmit} className="bg-gray-800 p-4 rounded-md " >
+                <header className="flex justify-between ">
+                    <h2 className="font-bold text-3xl">
+                        {
+                            !params.id ? "Crear Tarea" : "Editar Tarea"
+                        }
+                    </h2>
+                    <button 
+                        type="button"
+                        onClick={handlerDelete}
+                        className="bg-red-500 px-3 py-1 rounded-md"
+                    >Eliminar</button>
+
+                </header>
                 <input 
                     type="text" 
                     name="title"  
@@ -47,7 +81,8 @@ const FormPage = () => {
                     onChange={handlerChange}>
                 </textarea>
                 <button 
-                    className="bg-green-600 hover:bg-green-700 text-white font-mono px-4 py-2 rounded-lg">
+                    className="bg-green-600 hover:bg-green-700 text-white font-mono px-4 py-2 rounded-lg"
+                    type="submit">
                         Guardar
                 </button>
             </form>

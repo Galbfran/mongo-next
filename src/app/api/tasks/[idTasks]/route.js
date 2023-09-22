@@ -24,8 +24,8 @@ export async function GET(request, {params}){
 
 export async function DELETE(request, {params}){
     try {
-        let data = await request.json()
-        let taskDelete = await Task.findByIdAndDelete(params.idTasks , data, {
+        //let data = await request.json()
+        let taskDelete = await Task.findByIdAndDelete(params.idTasks , {
             new:true
         })
         
