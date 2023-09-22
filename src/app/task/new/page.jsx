@@ -7,6 +7,13 @@ import axios from "axios";
 const FormPage = () => {
     const router = useRouter();
     const params = useParams()
+    const getTask = async() =>{
+        const data = await axios.get(`/api/tasks/${params.id}`)
+        return data.data
+    }
+
+    const [task , setTask] = useState({})
+
     const [ newTask , setNewTask ] = useState({
         title:"",
         description:""
@@ -16,9 +23,8 @@ const FormPage = () => {
         setNewTask({...newTask , [e.target.name]: e.target.value})
     }
 
-    const handlerSubmit =async (e) =>{
+    const createTask =async (e) =>{
         try {
-            e.preventDefault()
             const res= await fetch("/api/tasks",{
                 method:"POST",
                 body: JSON.stringify(newTask)
@@ -31,12 +37,34 @@ const FormPage = () => {
         }
     }
 
+    const updateData = (obj) =>{
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key) && typeof obj[key] === 'string' && obj[key].trim() === '') {
+              delete obj[key];
+            }
+          }
+          return obj
+    }
+
+    const updateTask = async() =>{
+        const res = await axios.put(`/api/tasks/${params.id}` , updateData(newTask))
+        router.push("/")
+        router.refresh()
+    }
+
+    const handlerSubmit =async (e) =>{
+        e.preventDefault()
+        if(!params.id){
+            await createTask(e);
+        }else{
+            await updateTask()
+        }
+    }
+
     const handlerDelete =async () =>{
         if(window.confirm("Desea eliminar la tarea")){
             try {
-                console.log(params.id)
                 const res = await axios.delete(`/api/tasks/${params.id}`);
-                console.log(res)
                 router.push("/");
                 router.refresh();
                 
@@ -47,8 +75,14 @@ const FormPage = () => {
         
     }
     useEffect(() => {
-
-    },[])
+        const fetchData = async () => {
+            if (params.id) {
+            const taskData = await getTask();
+            setTask(taskData);
+            }
+        };
+        fetchData();
+    }, []);
 
 
     return(
@@ -60,13 +94,21 @@ const FormPage = () => {
                             !params.id ? "Crear Tarea" : "Editar Tarea"
                         }
                     </h2>
-                    <button 
+                    {params.id && <button 
                         type="button"
                         onClick={handlerDelete}
                         className="bg-red-500 px-3 py-1 rounded-md"
-                    >Eliminar</button>
+                    >Eliminar</button>}
 
                 </header>
+                <div >
+                    {
+                        params.id && <h2 className="font-bold text-3xl">Titulo: {task.title}</h2>
+                    }
+                    {
+                        params.id && <h2 className="font-bold ">Descripcion: {task.description}</h2>
+                    }
+                </div>
                 <input 
                     type="text" 
                     name="title"  
@@ -83,7 +125,9 @@ const FormPage = () => {
                 <button 
                     className="bg-green-600 hover:bg-green-700 text-white font-mono px-4 py-2 rounded-lg"
                     type="submit">
-                        Guardar
+                         {
+                            !params.id ? "Guardar" : "Editar"
+                        }
                 </button>
             </form>
         </div>
